@@ -1,0 +1,287 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily ADHD & Medication Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .custom-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Navigation / Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold shadow-sm">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold tracking-tight text-slate-100">MindPulse</h1>
+                    <p class="text-xs text-slate-400">Daily ADHD & Med Tracker</p>
+                </div>
+            </div>
+            <!-- Tab switchers -->
+            <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60 text-xs font-medium">
+                <button onclick="switchTab('logger')" id="btn-logger" class="px-3 py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-sm">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Today
+                </button>
+                <button onclick="switchTab('history')" id="btn-history" class="px-3 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-calendar-days mr-1"></i> History
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-2xl w-full mx-auto px-4 py-6 flex-grow mb-16 space-y-5">
+
+        <!-- TAB 1: LOGGER -->
+        <div id="tab-logger" class="tab-content active space-y-5">
+            
+            <!-- Date & Dose Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Date</label>
+                        <input type="date" id="log-date" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 w-full sm:w-auto">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Vortioxetine Dose</label>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="setDose('10mg')" id="dose-10" class="dose-btn px-3 py-2 rounded-xl text-xs font-semibold border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 transition">10 mg</button>
+                            <button type="button" onclick="setDose('15mg')" id="dose-15" class="dose-btn px-3 py-2 rounded-xl text-xs font-semibold border border-indigo-500 bg-indigo-600/20 text-indigo-300 transition">15 mg</button>
+                            <button type="button" onclick="setDose('20mg')" id="dose-20" class="dose-btn px-3 py-2 rounded-xl text-xs font-semibold border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 transition">20 mg</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Morning Wake-up -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-slate-200 flex items-center">
+                        <i class="fa-solid fa-sun text-amber-400 mr-2"></i> Morning Wake-up & Ease of Getting Up
+                    </span>
+                    <span id="val-morning" class="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">Okay / Neutral</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button type="button" onclick="setMorning('Heavy & Exhausted')" class="morning-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 text-center transition flex flex-col items-center justify-center gap-1">
+                        <span class="text-lg">😴</span>
+                        <span class="text-[11px] text-slate-400">Heavy</span>
+                    </button>
+                    <button type="button" onclick="setMorning('Slow / Grogggy')" class="morning-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 text-center transition flex flex-col items-center justify-center gap-1">
+                        <span class="text-lg">🥱</span>
+                        <span class="text-[11px] text-slate-400">Slow</span>
+                    </button>
+                    <button type="button" onclick="setMorning('Okay / Neutral')" class="morning-btn p-3 rounded-xl border border-indigo-500 bg-indigo-600/20 text-indigo-300 text-center transition flex flex-col items-center justify-center gap-1">
+                        <span class="text-lg">🙂</span>
+                        <span class="text-[11px] text-indigo-300">Okay</span>
+                    </button>
+                    <button type="button" onclick="setMorning('Not Sure / Skipped')" class="morning-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 text-center transition flex flex-col items-center justify-center gap-1">
+                        <span class="text-lg">❓</span>
+                        <span class="text-[11px] text-slate-400">Unsure</span>
+                    </button>
+                </div>
+                
+                <!-- Wake-up time & Out of bed time with Forgot buttons -->
+                <div class="pt-3 border-t border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-300 flex items-center">
+                            <i class="fa-solid fa-clock text-blue-400 mr-2"></i> Wake-up Time This Morning:
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <input type="time" id="log-waketime" value="07:30" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <button type="button" onclick="toggleTimeForgot('waketime')" id="btn-forgot-waketime" class="px-2.5 py-1.5 rounded-xl text-[11px] font-medium border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 transition">Forgot</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-300 flex items-center">
+                            <i class="fa-solid fa-person-walking text-emerald-400 mr-2"></i> Time Actually Got Out of Bed:
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <input type="time" id="log-outofbed" value="08:00" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <button type="button" onclick="toggleTimeForgot('outofbed')" id="btn-forgot-outofbed" class="px-2.5 py-1.5 rounded-xl text-[11px] font-medium border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 transition">Forgot</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood & Anxiety Sliders -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Mood -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-300 flex items-center">
+                            <i class="fa-solid fa-face-smile text-emerald-400 mr-2"></i> Baseline Mood
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-[10px] text-slate-400 flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="skip-mood" onchange="toggleSliderSkip('mood', this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"> Unsure
+                            </label>
+                            <span id="val-mood" class="text-xs font-bold text-emerald-400">5 / 10</span>
+                        </div>
+                    </div>
+                    <div id="wrapper-mood" class="space-y-1">
+                        <input type="range" id="slider-mood" min="0" max="10" value="5" class="w-full custom-slider accent-emerald-500 bg-slate-950 h-2 rounded-lg appearance-none cursor-pointer" oninput="updateSliderVal('mood', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-500">
+                            <span>Very Low (0)</span>
+                            <span>Neutral (5)</span>
+                            <span>Great (10)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Anxiety -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-300 flex items-center">
+                            <i class="fa-solid fa-wave-square text-sky-400 mr-2"></i> Anxiety Level
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-[10px] text-slate-400 flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="skip-anxiety" onchange="toggleSliderSkip('anxiety', this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"> Unsure
+                            </label>
+                            <span id="val-anxiety" class="text-xs font-bold text-sky-400">3 / 10</span>
+                        </div>
+                    </div>
+                    <div id="wrapper-anxiety" class="space-y-1">
+                        <input type="range" id="slider-anxiety" min="0" max="10" value="3" class="w-full custom-slider accent-sky-500 bg-slate-950 h-2 rounded-lg appearance-none cursor-pointer" oninput="updateSliderVal('anxiety', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-500">
+                            <span>None (0)</span>
+                            <span>Moderate (5)</span>
+                            <span>Extreme (10)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Initiation & Productivity (4 Tiers) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-slate-200 flex items-center">
+                        <i class="fa-solid fa-bullseye text-indigo-400 mr-2"></i> Task Initiation & Productivity
+                    </span>
+                    <span id="val-tier" class="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">Semi-Productive</span>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button type="button" onclick="setProductivityTier('Productive')" class="tier-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 text-center transition flex flex-col items-center gap-1">
+                        <span class="text-lg">🚀</span>
+                        <span class="text-[11px] font-medium text-slate-300">Productive</span>
+                    </button>
+                    <button type="button" onclick="setProductivityTier('Semi-Productive')" class="tier-btn p-3 rounded-xl border border-indigo-500 bg-indigo-600/20 text-indigo-300 text-center transition flex flex-col items-center gap-1">
+                        <span class="text-lg">⚖️</span>
+                        <span class="text-[11px] font-medium text-indigo-300">Semi-Prod</span>
+                    </button>
+                    <button type="button" onclick="setProductivityTier('Non-Productive')" class="tier-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 text-center transition flex flex-col items-center gap-1">
+                        <span class="text-lg">🛋️</span>
+                        <span class="text-[11px] font-medium text-slate-300">Non-Prod</span>
+                    </button>
+                    <button type="button" onclick="setProductivityTier('Not Sure / Skipped')" class="tier-btn p-3 rounded-xl border border-slate-800 bg-slate-950 hover:border-slate-700 text-center transition flex flex-col items-center gap-1">
+                        <span class="text-lg">❓</span>
+                        <span class="text-[11px] font-medium text-slate-300">Unsure</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nausea & Daytime Fatigue Sliders -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Nausea -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-300 flex items-center">
+                            <i class="fa-solid fa-pills text-rose-400 mr-2"></i> Nausea
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-[10px] text-slate-400 flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="skip-nausea" onchange="toggleSliderSkip('nausea', this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"> Unsure
+                            </label>
+                            <span id="val-nausea" class="text-xs font-bold text-rose-400">0 / 10</span>
+                        </div>
+                    </div>
+                    <div id="wrapper-nausea" class="space-y-1">
+                        <input type="range" id="slider-nausea" min="0" max="10" value="0" class="w-full custom-slider accent-rose-500 bg-slate-950 h-2 rounded-lg appearance-none cursor-pointer" oninput="updateSliderVal('nausea', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-500">
+                            <span>None (0)</span>
+                            <span>Moderate (5)</span>
+                            <span>Severe (10)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daytime Fatigue -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-300 flex items-center">
+                            <i class="fa-solid fa-battery-half text-amber-400 mr-2"></i> Daytime Fatigue
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-[10px] text-slate-400 flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="skip-fatigue" onchange="toggleSliderSkip('fatigue', this)" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"> Unsure
+                            </label>
+                            <span id="val-fatigue" class="text-xs font-bold text-amber-400">4 / 10</span>
+                        </div>
+                    </div>
+                    <div id="wrapper-fatigue" class="space-y-1">
+                        <input type="range" id="slider-fatigue" min="0" max="10" value="4" class="w-full custom-slider accent-amber-500 bg-slate-950 h-2 rounded-lg appearance-none cursor-pointer" oninput="updateSliderVal('fatigue', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-500">
+                            <span>Energized (0)</span>
+                            <span>Moderate (5)</span>
+                            <span>Exhausted (10)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media & Fap Tracking -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Social Media Usage -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-share-nodes text-purple-400 mr-1.5"></i> Social Media Use
+                    </label>
+                    <div class="grid grid-cols-4 gap-1">
+                        <button type="button" onclick="setSocial('Low')" class="social-btn py-2.5 rounded-xl text-xs font-medium border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 text-center transition">Low</button>
+                        <button type="button" onclick="setSocial('Moderate')" class="social-btn py-2.5 rounded-xl text-xs font-medium border border-indigo-500 bg-indigo-600/20 text-indigo-300 text-center transition">Mod</button>
+                        <button type="button" onclick="setSocial('Heavy')" 
